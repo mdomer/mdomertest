@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 namespace Soneta.Examples.Rozwiazanie.Extender
@@ -11,19 +12,19 @@ namespace Soneta.Examples.Rozwiazanie.Extender
     {
         // linki do githuba i api
        
-        //private const string RepoName = "angular/angular";
-        private const string RepoName = "mdomer/mdomertest";
+        private const string RepoName = "auth0-blog/angular2-authentication-sample";
+        //private const string RepoName = "mdomer/mdomertest";
         private const string GitHubApiUrl = "https://api.github.com/repos/{0}/commits";
         private const string GitHubAppUrl = "https://github.com/{0}";
         private List<Author> _allCommits;
 
 
         // informacyjny string
-
         public string RepoUri
         {
             get { return string.Format(GitHubAppUrl, RepoName); }
         }
+        
         // ilość commit-ów, które dana osoba wprowadziła danego dnia
         public IEnumerable<DailyStatistic> DailyStatstics
         {
@@ -69,34 +70,44 @@ namespace Soneta.Examples.Rozwiazanie.Extender
         }
 
         // sciaga wszystkie commity do repozytorium
-        public void GetAllCommitsForUri(string uri)
+        private void GetAllCommitsForUri(string uri)
         {
-            var returnJson = DownloadString(uri);
-            var parsedJson = ConvertToListOfCommits(returnJson);
-            _allCommits = parsedJson.Select(x => x.Commit.Author).ToList();
+            var allCommits = new List<ReturnValueItem>();
+
+            var respond = DownloadString(uri);
+            allCommits.AddRange(ConvertToListOfCommits(respond.Value));
+
+            while (!string.IsNullOrWhiteSpace(respond.NextUrl))
+            {
+                respond = DownloadString(respond.NextUrl);
+                allCommits.AddRange(ConvertToListOfCommits(respond.Value));
+            }
+
+            _allCommits = allCommits.Select(x => x.Commit.Author).ToList();
         }
 
-        public string DownloadString(string uri)
+        // zapytanie GET 
+        private WebRespond DownloadString(string uri)
         {
             try
             {
+                var respond = new WebRespond();
                 var client = new WebClient();
-                string returnValue;
-                // wazne zeby dodać naglowek USER-AGENT
                 client.Headers.Add("user-agent", "michal.d85@gmail.com");
 
                 using (var data = client.OpenRead(uri))
                 {
+                    respond.NextUrl = GetNextLink(client.ResponseHeaders["Link"]);
                     if (data == null)
                     {
                         throw new Exception("Problem z polaczeniem");
                     }
                     var reader = new StreamReader(data);
-                    returnValue = reader.ReadToEnd();
+                    respond.Value = reader.ReadToEnd();
                     data.Close();
                     reader.Close();
                 }
-                return returnValue;
+                return respond;
             }
             catch (Exception ex)
             {
@@ -105,9 +116,32 @@ namespace Soneta.Examples.Rozwiazanie.Extender
             return null;
         }
 
-        public static List<ReturnValueItem> ConvertToListOfCommits(string jsonData)
+        private List<ReturnValueItem> ConvertToListOfCommits(string jsonData)
         {
             return JsonConvert.DeserializeObject<List<ReturnValueItem>>(jsonData);
+        }
+
+        // obsluga stronicowania z github-a
+        // przyklad : 
+        // <https://api.github.com/repositories/34740196/commits?page=2>; rel="next",
+        // <https://api.github.com/repositories/34740196/commits?page=4>; rel="last"
+        private string GetNextLink(string linkHeader)
+        {
+            var arr = linkHeader.Split(',');
+            // jezeli dostaniemy nie poprawna odpowiedz 
+            if (arr.Length == 0)
+            {
+                throw new Exception("Niepoprawna odpowiedz z serwera");
+            }
+            if (arr.FirstOrDefault(x => x.Contains("rel=\"next\"")) == null)
+            {
+                return null;
+            }
+            var regex = new Regex("<(.*?)>");
+            var returnVal = regex.Match(arr.First()).Value;
+            returnVal = returnVal.Replace('<', ' ');
+            returnVal = returnVal.Replace('>', ' ');
+            return returnVal.Trim();
         }
     }
 }

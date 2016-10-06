@@ -18,6 +18,14 @@ namespace Soneta.Examples.Rozwiazanie.Extender
         public double AverageCommitCount { get; set; }
     }
 
+    // do obslugi zapytan get
+
+    public class WebRespond
+    {
+        public string Value { get; set; }
+        public string NextUrl { get; set; }
+    }
+
     // obiekty do deserializacji z api github-a
 
     [DataContract]
