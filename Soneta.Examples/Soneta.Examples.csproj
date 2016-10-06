@@ -118,6 +118,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
+    <Compile Include="TestMain.cs" />
     <Compile Include="Utils\Tools.cs" />
   </ItemGroup>
   <ItemGroup>

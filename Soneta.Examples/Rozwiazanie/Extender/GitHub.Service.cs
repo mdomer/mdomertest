@@ -4,22 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using Newtonsoft.Json;
-using Soneta.Business;
-using Soneta.Business.UI;
 
 namespace Soneta.Examples.Rozwiazanie.Extender
 {
     public class GitHubService
     {
         // linki do githuba i api
-        //11
-        //22
-        // 33
-        //44
-        //55
-        //66
        
-        private const string RepoName = "angular/angular";
+        //private const string RepoName = "angular/angular";
+        private const string RepoName = "mdomer/mdomertest";
         private const string GitHubApiUrl = "https://api.github.com/repos/{0}/commits";
         private const string GitHubAppUrl = "https://github.com/{0}";
         private List<Author> _allCommits;
