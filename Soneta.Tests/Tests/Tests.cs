@@ -2,6 +2,10 @@
 
 namespace Soneta.Examples.Rozwiazanie.Tests
 {
+    // uznalem ze najwaznisze przy testowaniu beda dwie metody 
+    // z klasy GitHubService
+    // GetAvarageStatistics() or GetDailyStatistics();
+    // 
     [TestFixture]
     public class Tests
     {

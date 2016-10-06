@@ -34,7 +34,13 @@ namespace Soneta.Examples.Rozwiazanie.Extender
                 {
                     GetAllCommitsForUri(string.Format(GitHubApiUrl, RepoName));
                 }
-                return _allCommits.GroupBy(x => x.DateTime.Date)
+                return GetDailyStatistics(_allCommits);
+            }
+        }
+
+        public IEnumerable<DailyStatistic> GetDailyStatistics(List<Author> commits)
+        {
+            return _allCommits.GroupBy(x => x.DateTime.Date)
                 .Select(y => new
                 {
                     Date = y.Key,
@@ -47,7 +53,17 @@ namespace Soneta.Examples.Rozwiazanie.Extender
                         }).ToList()
                 }).SelectMany(x => x.Value).OrderByDescending(x => x.Date)
                 .ToList(); // agregacja po dniu
-            }
+        }
+
+        public IEnumerable<DailyStatistic> GetAvarageStatistics(List<Author> commits)
+        {
+            return commits.GroupBy(x => x.Email)
+                .Select(y => new AverageStatistic
+                {
+                    Author = y.Key,
+                    AverageCommitCount = (double)(y.GroupBy(c => c.DateTime.Date).Select(v => v.Count()).Sum()) /
+                           (double)(y.GroupBy(c => c.DateTime.Date).Select(v => v.Count()).Count())
+                }).ToList();
         }
 
         // średnia ilość commit-ów dodawanych przez daną osobę dziennie
