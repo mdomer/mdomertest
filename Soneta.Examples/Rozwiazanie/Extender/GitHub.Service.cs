@@ -40,7 +40,7 @@ namespace Soneta.Examples.Rozwiazanie.Extender
 
         public IEnumerable<DailyStatistic> GetDailyStatistics(List<Author> commits)
         {
-            return _allCommits.GroupBy(x => x.DateTime.Date)
+            return commits.GroupBy(x => x.DateTime.Date)
                 .Select(y => new
                 {
                     Date = y.Key,
@@ -55,17 +55,6 @@ namespace Soneta.Examples.Rozwiazanie.Extender
                 .ToList(); // agregacja po dniu
         }
 
-        public IEnumerable<DailyStatistic> GetAvarageStatistics(List<Author> commits)
-        {
-            return commits.GroupBy(x => x.Email)
-                .Select(y => new AverageStatistic
-                {
-                    Author = y.Key,
-                    AverageCommitCount = (double)(y.GroupBy(c => c.DateTime.Date).Select(v => v.Count()).Sum()) /
-                           (double)(y.GroupBy(c => c.DateTime.Date).Select(v => v.Count()).Count())
-                }).ToList();
-        }
-
         // średnia ilość commit-ów dodawanych przez daną osobę dziennie
         public IEnumerable<AverageStatistic> AvarageStatistics
         {
@@ -75,14 +64,19 @@ namespace Soneta.Examples.Rozwiazanie.Extender
                 {
                     GetAllCommitsForUri(string.Format(GitHubApiUrl, RepoName));
                 }
-                return _allCommits.GroupBy(x => x.Email)
+                return GetAvarageStatistics(_allCommits);
+            }
+        }
+
+        public IEnumerable<AverageStatistic> GetAvarageStatistics(List<Author> commits)
+        {
+            return commits.GroupBy(x => x.Email)
                 .Select(y => new AverageStatistic
                 {
                     Author = y.Key,
                     AverageCommitCount = (double)(y.GroupBy(c => c.DateTime.Date).Select(v => v.Count()).Sum()) /
                            (double)(y.GroupBy(c => c.DateTime.Date).Select(v => v.Count()).Count())
                 }).ToList();
-            }
         }
 
         // sciaga wszystkie commity do repozytorium
