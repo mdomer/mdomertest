@@ -1,0 +1,29 @@
+﻿<?xml version="1.0"?>
+<DataForm xmlns="http://www.enova.pl/schema/form.xsd" Priority="100">
+  <Page CaptionHtml="Statystki z GitHuba" DataContext="{DataSource}">
+    <Group CaptionHtml="Podaj informacje">
+      <Label CaptionHtml="{RepoUri}"/>
+    </Group>
+    <Group CaptionHtml="ilość commit-ów, które dana osoba wprowadziła danego dnia">
+      <Row>
+        <Stack Width="200" Height="10" >
+          <Grid EditValue="{DailyStatstics}" Width="150" Height="*" >
+            <Field CaptionHtml="Data" Width="15" EditValue="{Date}" />
+            <Field CaptionHtml="Autor" Width="20" EditValue="{Author}" />
+            <Field CaptionHtml="Ilość Commitów" Width="15" EditValue="{CommitsCount}" />
+          </Grid>
+        </Stack>
+      </Row>
+    </Group>
+    <Group CaptionHtml="średnia ilość commit-ów dodawanych przez daną osobę dziennie">
+      <Row>
+        <Stack Width="200" Height="10" >
+          <Grid EditValue="{AvarageStatistics}" Width="150" Height="*" >
+            <Field CaptionHtml="Autor" Width="20" EditValue="{Author}" />
+            <Field CaptionHtml="Średnia Liczba Commitow" Width="15" EditValue="{AverageCommitCount}" />
+          </Grid>
+        </Stack>
+      </Row>
+    </Group>
+  </Page>
+</DataForm>
