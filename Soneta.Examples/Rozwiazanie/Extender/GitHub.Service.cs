@@ -12,6 +12,7 @@ namespace Soneta.Examples.Rozwiazanie.Extender
     public class GitHubService
     {
         // linki do githuba i api
+        //11
         private const string RepoName = "angular/angular";
         private const string GitHubApiUrl = "https://api.github.com/repos/{0}/commits";
         private const string GitHubAppUrl = "https://github.com/{0}";
